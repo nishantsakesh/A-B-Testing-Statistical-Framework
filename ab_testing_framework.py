@@ -250,7 +250,10 @@ class MultipleTesting:
         Returns:
             tuple: (corrected_p_values, significant_results_mask)
         """
-        is_significant, corrected_p_values, _, _ = fdrcorrection(
+        # FIX: Changed unpacking from 4 values to 2.
+        # The error "expected 4, got 2" indicates an older version of statsmodels
+        # which only returns (reject, pvals_corrected).
+        is_significant, corrected_p_values = fdrcorrection(
             self.p_values, 
             alpha=self.alpha, 
             method='indep'
@@ -258,7 +261,7 @@ class MultipleTesting:
         
         return {
             'method': 'Benjamini-Hochberg (FDR)',
-            'corrected_p_values': corrected_p_values,
+            'corrected_p_values': list(corrected_p_values), # Convert numpy array to list
             'is_significant': list(is_significant)
         }
 
@@ -401,3 +404,4 @@ class Utils:
              if is_significant: color = "orange" # Statistically sig, but practically insignificant
 
         return stat_sig_msg, prac_sig_msg, color
+
